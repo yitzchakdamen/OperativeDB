@@ -1,0 +1,38 @@
+﻿# === General ===
+bin/
+obj/
+*.log
+*.tmp
+
+# === Visual Studio ===
+.vs/
+*.user
+*.suo
+*.cache
+*.dbmdl
+
+# === VS Code ===
+.vscode/
+
+# === Build and Publish ===
+Debug/
+Release/
+publish/
+TestResults/
+
+# === OS-specific ===
+.DS_Store
+Thumbs.db
+
+# === NuGet ===
+*.nupkg
+*.snupkg
+.nuget/
+
+# === Rider (JetBrains) ===
+.idea/
+*.DotSettings.user
+
+# === Local secrets / config ===
+secrets.json
+appsettings.Development.json
