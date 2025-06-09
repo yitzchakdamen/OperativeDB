@@ -16,17 +16,27 @@ namespace OperativeDB
             MySqlDataReader reader;
             List<Agent> agents = new();
 
-            reader = new MySqlCommand(Query, coon).ExecuteReader();
-
-            while (reader.Read())
+            try
             {
-                Agent agent = new Agent.Builder().SetId(reader.GetInt32("id")).SetCodeName(reader.GetString("codeName"))
-                    .SetLocation(reader.GetString("location")).SetRealName(reader.GetString("realName"))
-                    .SetStatus(reader.GetString("status")).SetMissionsCompleted(reader.GetInt32("missionsCompleted"))
-                    .Build();
-                agents.Add(agent);
+                reader = new MySqlCommand(Query, coon).ExecuteReader();
+                while (reader.Read())
+                {
+                    Agent agent = new Agent.Builder().SetId(reader.GetInt32("id")).SetCodeName(reader.GetString("codeName"))
+                        .SetLocation(reader.GetString("location")).SetRealName(reader.GetString("realName"))
+                        .SetStatus(reader.GetString("status")).SetMissionsCompleted(reader.GetInt32("missionsCompleted"))
+                        .Build();
+                    agents.Add(agent);
+                }
             }
-            coon.Close();
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+            finally
+            {
+                coon.Close();
+            }
             return agents;
         }
 
@@ -38,14 +48,26 @@ namespace OperativeDB
             INSERT INTO agents (codeName, realName, location, status, missionsCompleted)
              VALUES (@codeName, @realName, @location, @status, @missionsCompleted);";
 
-            cmd.Parameters.AddWithValue("@codeName",a.CodeName);
-            cmd.Parameters.AddWithValue("@realName",a.RealName);
-            cmd.Parameters.AddWithValue("@location",a.Location);
-            cmd.Parameters.AddWithValue("@status",a.Status);
-            cmd.Parameters.AddWithValue("@missionsCompleted",a.MissionsCompleted);
+            cmd.Parameters.AddWithValue("@codeName", a.CodeName);
+            cmd.Parameters.AddWithValue("@realName", a.RealName);
+            cmd.Parameters.AddWithValue("@location", a.Location);
+            cmd.Parameters.AddWithValue("@status", a.Status);
+            cmd.Parameters.AddWithValue("@missionsCompleted", a.MissionsCompleted);
 
-            cmd.ExecuteNonQuery();
-            coon.Close();
+            
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+            finally
+            {
+                coon.Close();
+            }
         }
 
         public void UpdateLocation(int agentId, string newLocation)
@@ -56,16 +78,38 @@ namespace OperativeDB
             cmd.Parameters.AddWithValue("@newLocation", newLocation);
             cmd.Parameters.AddWithValue("@agentId", agentId);
 
-            cmd.ExecuteNonQuery();
-            coon.Close();
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+            finally
+            {
+                coon.Close();
+            }
         }
 
         public void Delete(int agentId)
         {
             MySqlConnection coon = _MySqlData.GetConnction();
             string Query = $"DELETE FROM agents WHERE agents.id = {agentId};";
-            new MySqlCommand(Query, coon).ExecuteNonQuery();
-            coon.Close();
+            try
+            {
+                new MySqlCommand(Query, coon).ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+            finally
+            {
+                coon.Close();
+            }
         }
 
         public List<Agent> SearchAgentsByCode(string partialCode)
@@ -79,16 +123,27 @@ namespace OperativeDB
             string Query = "SELECT agents.status, COUNT(*) as 'sum status'  FROM `agents` GROUP BY status;";
             MySqlConnection coon = _MySqlData.GetConnction();
             MySqlDataReader reader;
-
-            reader = new MySqlCommand(Query, coon).ExecuteReader();
-
-            while (reader.Read())
+            
+            try
             {
-                string status = reader.GetString("status");
-                int count = reader.GetInt32("sum status");
-                CountAgentsByStatus[status] = count;
+                reader = new MySqlCommand(Query, coon).ExecuteReader();
+
+                while (reader.Read())
+                {
+                    string status = reader.GetString("status");
+                    int count = reader.GetInt32("sum status");
+                    CountAgentsByStatus[status] = count;
+                }
             }
-            coon.Close();
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+            finally
+            {
+                coon.Close();
+            }
             return CountAgentsByStatus;
         }
 
