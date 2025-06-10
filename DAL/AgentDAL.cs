@@ -24,7 +24,7 @@ namespace OperativeDB
 
                 while (reader.Read())
                 {
-                    agents.Add(ProduceAgent(reader));
+                    agents.Add(ProduceAgent.Produce(reader));
                 }
             }
             catch (Exception ex)
@@ -129,7 +129,7 @@ namespace OperativeDB
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    agents.Add(ProduceAgent(reader));
+                    agents.Add(ProduceAgent.Produce(reader));
                 }
                 return agents;
             }
@@ -174,18 +174,18 @@ namespace OperativeDB
             return CountAgentsByStatus;
         }
 
-        private Agent ProduceAgent(MySqlDataReader reader)
-        {
-            Agent agent = new Agent.Builder()
-                    .SetId(reader.GetInt32("id"))
-                    .SetCodeName(reader.GetString("codeName"))
-                    .SetLocation(reader.GetString("location"))
-                    .SetRealName(reader.GetString("realName"))
-                    .SetStatus(reader.GetString("status"))
-                    .SetMissionsCompleted(reader.GetInt32("missionsCompleted"))
-                    .Build();
+        // private Agent ProduceAgent(MySqlDataReader reader)
+        // {
+        //     Agent agent = new Agent.Builder()
+        //             .SetId(reader.GetInt32("id"))
+        //             .SetCodeName(reader.GetString("codeName"))
+        //             .SetLocation(reader.GetString("location"))
+        //             .SetRealName(reader.GetString("realName"))
+        //             .SetStatus(reader.GetString("status"))
+        //             .SetMissionsCompleted(reader.GetInt32("missionsCompleted"))
+        //             .Build();
 
-            return agent;
-        }
+        //     return agent;
+        // }
     }
 }
