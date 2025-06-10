@@ -187,9 +187,5 @@ namespace OperativeDB
 
             return agent;
         }
-
-
     }
-
-
 }
