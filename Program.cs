@@ -6,14 +6,20 @@ namespace OperativeDB
     {
         static void Main()
         {
-            MySqlData mySqlData = new MySqlData("eagleEyeDB").Connect();
+            Database mySqlData = new Database("eagleEyeDB").Connect();
             AgentDAL agentDAL = new(mySqlData);
 
-            Agent agent = new Agent.Builder().SetCodeName("4").SetLocation("isrel").SetRealName("mose").SetStatus("Active").SetMissionsCompleted(5).Build();
+            Agent agent = new Agent.Builder()
+                .SetCodeName("4")
+                .SetLocation("isrel")
+                .SetRealName("mose")
+                .SetStatus("Active")
+                .SetMissionsCompleted(5)
+                .Build();
 
             agentDAL.Add(agent);
             agentDAL.Delete(6);
-            agentDAL.UpdateLocation(5, "aaaaaaaaa");
+            agentDAL.UpdateLocation(5, "Jerusalem");
             Dictionary<string, int> dict = agentDAL.CountAgentsByStatus();
 
 
@@ -21,9 +27,7 @@ namespace OperativeDB
             var SearchAgentsByCode = agentDAL.SearchAgentsByCode("AGD5575555");
 
             ListAgent.Print();
-            Console.WriteLine("======================");
             SearchAgentsByCode.Print();
-            Console.WriteLine("======================");
             dict.Print();
             
         }

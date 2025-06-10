@@ -2,18 +2,18 @@ using MySql.Data.MySqlClient;
 
 namespace OperativeDB
 {
-    public class MySqlData
+    public class Database
     {
         string DbName;
         static string connectionString;
-        public MySqlData(string dbName="eagleEyeDB")
+        public Database(string dbName="eagleEyeDB")
         {
             DbName = dbName;
             connectionString = $"Server=Localhost;Port=3306;Database={DbName};User=root;Password='';";
         }
 
         private MySqlConnection connection;
-        public MySqlData Connect()
+        public Database Connect()
         {
             var conn = new MySqlConnection(connectionString: connectionString);
             connection = conn;

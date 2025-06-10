@@ -2,30 +2,29 @@ using MySql.Data.MySqlClient;
 
 namespace OperativeDB
 {
-    class AgentDAL // : IDal
+    class AgentDAL
     {
-        private MySqlData _MySqlData;
-        public AgentDAL(MySqlData mySqlData)
+        private Database _MySqlData;
+        public AgentDAL(Database database)
         {
-            _MySqlData = mySqlData;
+            _MySqlData = database;
         }
 
-        public List<Agent> GetAll(string Query = "SELECT * FROM `agents`;")
+        public List<Agent> GetAll()
         {
+            string Query = "SELECT * FROM `agents`;";
             MySqlConnection coon = _MySqlData.GetConnction();
             MySqlDataReader reader;
             List<Agent> agents = new();
 
+
             try
             {
                 reader = new MySqlCommand(Query, coon).ExecuteReader();
+
                 while (reader.Read())
                 {
-                    Agent agent = new Agent.Builder().SetId(reader.GetInt32("id")).SetCodeName(reader.GetString("codeName"))
-                        .SetLocation(reader.GetString("location")).SetRealName(reader.GetString("realName"))
-                        .SetStatus(reader.GetString("status")).SetMissionsCompleted(reader.GetInt32("missionsCompleted"))
-                        .Build();
-                    agents.Add(agent);
+                    agents.Add(ProduceAgent(reader));
                 }
             }
             catch (Exception ex)
@@ -54,7 +53,7 @@ namespace OperativeDB
             cmd.Parameters.AddWithValue("@status", a.Status);
             cmd.Parameters.AddWithValue("@missionsCompleted", a.MissionsCompleted);
 
-            
+
             try
             {
                 cmd.ExecuteNonQuery();
@@ -96,10 +95,12 @@ namespace OperativeDB
         public void Delete(int agentId)
         {
             MySqlConnection coon = _MySqlData.GetConnction();
-            string Query = $"DELETE FROM agents WHERE agents.id = {agentId};";
+            MySqlCommand cmd = coon.CreateCommand();
+            cmd.CommandText = "DELETE FROM agents WHERE agents.id = @AgentId";
+            cmd.Parameters.AddWithValue("@agentId", agentId);
             try
             {
-                new MySqlCommand(Query, coon).ExecuteNonQuery();
+                cmd.ExecuteNonQuery();
             }
             catch (Exception ex)
             {
@@ -112,9 +113,35 @@ namespace OperativeDB
             }
         }
 
-        public List<Agent> SearchAgentsByCode(string partialCode)
+        public List<Agent> SearchAgentsByCode(string Code)
         {
-            return GetAll($"SELECT * FROM agents WHERE agents.codeName = '{partialCode}';");
+            MySqlConnection coon = _MySqlData.GetConnction();
+            MySqlCommand cmd = coon.CreateCommand();
+            MySqlDataReader reader;
+
+            List<Agent> agents = new();
+
+            cmd.CommandText = "SELECT * FROM agents WHERE agents.codeName = @Code";
+            cmd.Parameters.AddWithValue("@Code", Code);
+
+            try
+            {
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    agents.Add(ProduceAgent(reader));
+                }
+                return agents;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+            finally
+            {
+                coon.Close();
+            }
         }
 
         public Dictionary<string, int> CountAgentsByStatus()
@@ -123,7 +150,7 @@ namespace OperativeDB
             string Query = "SELECT agents.status, COUNT(*) as 'sum status'  FROM `agents` GROUP BY status;";
             MySqlConnection coon = _MySqlData.GetConnction();
             MySqlDataReader reader;
-            
+
             try
             {
                 reader = new MySqlCommand(Query, coon).ExecuteReader();
@@ -146,6 +173,21 @@ namespace OperativeDB
             }
             return CountAgentsByStatus;
         }
+
+        private Agent ProduceAgent(MySqlDataReader reader)
+        {
+            Agent agent = new Agent.Builder()
+                    .SetId(reader.GetInt32("id"))
+                    .SetCodeName(reader.GetString("codeName"))
+                    .SetLocation(reader.GetString("location"))
+                    .SetRealName(reader.GetString("realName"))
+                    .SetStatus(reader.GetString("status"))
+                    .SetMissionsCompleted(reader.GetInt32("missionsCompleted"))
+                    .Build();
+
+            return agent;
+        }
+
 
     }
 
