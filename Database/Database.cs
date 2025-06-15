@@ -6,7 +6,7 @@ namespace OperativeDB
     {
         string DbName;
         static string connectionString;
-        public Database(string dbName="eagleEyeDB")
+        public Database(string dbName = "eagleEyeDB")
         {
             DbName = dbName;
             connectionString = $"Server=Localhost;Port=3306;Database={DbName};User=root;Password='';";
@@ -43,6 +43,8 @@ namespace OperativeDB
                 throw;
             }
         }
+        
+        
     }
 
 }
